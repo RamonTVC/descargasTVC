@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preparando su descarga…</title>
+<style>
+  :root{
+    --bg:#0f172a;
+    --card:#111827;
+    --accent:#3b82f6;
+    --text:#e5e7eb;
+    --muted:#9ca3af;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--bg);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    color:var(--text);
+  }
+  .card{
+    background:var(--card);
+    padding:40px 32px;
+    border-radius:16px;
+    max-width:420px;
+    width:90%;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  h1{
+    font-size:1.25rem;
+    margin:0 0 8px;
+  }
+  p{
+    color:var(--muted);
+    margin:0 0 20px;
+  }
+  .count{
+    font-weight:700;
+    color:var(--accent);
+  }
+  .bar{
+    height:6px;
+    width:100%;
+    background:#1f2937;
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    width:0%;
+    background:var(--accent);
+    transition:width 1s linear;
+  }
+  .manual{
+    margin-top:18px;
+    font-size:.85rem;
+  }
+  .manual a{
+    color:var(--accent);
+    text-decoration:none;
+  }
+  .error{
+    color:#f87171;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">Preparando su descarga…</h1>
+    <p id="msg">Espere <span class="count" id="count">3</span> segundos…</p>
+    <div class="bar"><div class="bar-fill" id="fill"></div></div>
+    <div class="manual" id="manual" style="display:none;">
+      Si la descarga no comienza automáticamente, <a id="manual-link" href="#">haga clic aquí</a>.
+    </div>
+  </div>
+
+<script>
+(function () {
+  var TOTAL_SECONDS = 3;
+
+  function getSlug() {
+    // Soporta /slug (rewrite de _redirects) o /download.html?s=slug
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('s')) return params.get('s').toLowerCase();
+    var path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+    return path.toLowerCase();
+  }
+
+  function showError(text) {
+    document.getElementById('title').textContent = 'No se encontró el archivo';
+    document.getElementById('msg').innerHTML = '<span class="error">' + text + '</span>';
+    document.getElementById('fill').style.width = '0%';
+  }
+
+  function startCountdown(entry) {
+    document.getElementById('title').textContent =
+      'Descargando ' + (entry.name || 'archivo') + (entry.version ? ' v' + entry.version : '');
+
+    var manual = document.getElementById('manual');
+    var manualLink = document.getElementById('manual-link');
+    manualLink.href = entry.url;
+
+    var remaining = TOTAL_SECONDS;
+    var countEl = document.getElementById('count');
+    var fillEl = document.getElementById('fill');
+
+    var tick = function () {
+      fillEl.style.width = (((TOTAL_SECONDS - remaining + 1) / TOTAL_SECONDS) * 100) + '%';
+      countEl.textContent = remaining;
+      if (remaining <= 0) {
+        clearInterval(timer);
+        window.location.href = entry.url;
+        manual.style.display = 'block';
+        return;
+      }
+      remaining--;
+    };
+
+    tick();
+    var timer = setInterval(tick, 1000);
+  }
+
+  var slug = getSlug();
+  if (!slug) {
+    showError('No se especificó ningún software.');
+    return;
+  }
+
+  fetch('/downloads.json', { cache: 'no-store' })
+    .then(function (r) {
+      if (!r.ok) throw new Error('no-json');
+      return r.json();
+    })
+    .then(function (data) {
+      var entry = data[slug];
+      if (!entry || !entry.url) {
+        showError('El software "' + slug + '" no está disponible.');
+        return;
+      }
+      startCountdown(entry);
+    })
+    .catch(function () {
+      showError('Ocurrió un problema al preparar la descarga. Intente más tarde.');
+    });
+})();
+</script>
+</body>
+</html>

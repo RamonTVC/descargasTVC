@@ -1,0 +1,4 @@
+# Cualquier ruta que no sea un archivo real (download.html, downloads.json, etc.)
+# se sirve con download.html, conservando la URL en la barra de direcciones.
+# Ej: /zkbiocvsecurity  y  /biotimepro  se resuelven aquí.
+/*    /download.html   200

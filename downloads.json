@@ -1,0 +1,17 @@
+{
+  "zkbiocvsecurity": {
+    "name": "ZKBio CVSecurity",
+    "version": "6.7.1",
+    "url": "tvcmty.dvrdns.org:8090/files/zkteco/zkbiocvsecurity/Overseas_ZKBio_CVSecurity_6.7.1_R_x64_2026-01-15.zip"
+  },
+  "zkbiocvaccess": {
+    "name": "ZKBio CVAcess",
+    "version": "4.2.1",
+    "url": "tvcmty.dvrdns.org:8090/files/zkteco/zkbiocvsecurity/Overseas_ZKBio_CVSecurity_6.7.1_R_x64_2026-01-15.zip"
+  },
+  "biotimepro": {
+    "name": "BioTime Pro",
+    "version": "1.0.6.5",
+    "url": "tvcmty.dvrdns.org:8090/files/zkteco/biotimepro/BioTime-Pro-1.0.6.5-Software-97326.zip"
+  }
+}
